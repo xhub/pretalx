@@ -411,11 +411,13 @@ class SubmissionList(EventPermissionRequired, Sortable, Filterable, ListView):
     sortable_fields = ('code', 'title', 'state', 'is_featured')
     permission_required = 'orga.view_submissions'
     paginate_by = 25
+    async_enabled = True
 
-    def dispatch(self, *args, **kwargs):
+    async def dispatch(self, *args, **kwargs):
+        import pdb; pdb.set_trace()
         if self.request.user.has_perm('orga.view_speakers', self.request.event):
             self.default_filters.add('speakers__name__icontains')
-        return super().dispatch(*args, **kwargs)
+        return await super().dispatch(*args, **kwargs)
 
     def get_queryset(self):
         qs = (

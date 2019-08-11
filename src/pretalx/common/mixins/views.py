@@ -69,6 +69,7 @@ class Sortable:
     """
 
     sortable_fields = []
+    async_enabled = True
 
     def sort_queryset(self, qs):
         sort_key = self.request.GET.get('sort')
@@ -107,6 +108,7 @@ class Sortable:
 
 class Filterable:
 
+    async_enabled = True
     filter_fields = []
     default_filters = []
 
@@ -167,6 +169,7 @@ class Filterable:
 
 
 class PermissionRequired(PermissionRequiredMixin):
+    async_enabled = True
 
     def has_permission(self):
         if not hasattr(self, 'get_permission_object') and hasattr(self, 'object'):
@@ -204,6 +207,7 @@ class PermissionRequired(PermissionRequiredMixin):
 
 
 class EventPermissionRequired(PermissionRequired):
+    async_enabled = True
     def get_permission_object(self):
         return self.request.event
 

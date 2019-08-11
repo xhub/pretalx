@@ -15,6 +15,11 @@ from pretalx.submission.models.submission import SubmissionStates
 
 class DashboardEventListView(TemplateView):
     template_name = 'orga/event_list.html'
+    async_enabled = True
+
+    async def get(self, request, **kwargs):
+        import asgiref
+        return await asgiref.sync.sync_to_async(super().get)(request, **kwargs)
 
     @context
     def current_orga_events(self):
@@ -44,6 +49,7 @@ class DashboardOrganiserListView(PermissionRequired, TemplateView):
 class EventDashboardView(EventPermissionRequired, TemplateView):
     template_name = 'orga/event/dashboard.html'
     permission_required = 'orga.view_orga_area'
+    async_enabled=True
 
     def get_cfp_tiles(self, event, _now):
         result = []
