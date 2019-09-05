@@ -55,6 +55,7 @@ DJANGO_APPS = [
     'django.contrib.staticfiles',
 ]
 EXTERNAL_APPS = [
+    'bridgekeeper',
     'compressor',
     'djangoformsetjs',
     'django_filters',
@@ -316,7 +317,7 @@ FORMAT_MODULE_PATH = ['pretalx.common.formats']
 AUTH_USER_MODEL = 'person.User'
 LOGIN_URL = '/orga/login'
 AUTHENTICATION_BACKENDS = (
-    'rules.permissions.ObjectPermissionBackend',
+    'bridgekeeper.backends.RulePermissionBackend',
     'django.contrib.auth.backends.ModelBackend',
     'pretalx.common.auth.AuthenticationTokenBackend',
 )

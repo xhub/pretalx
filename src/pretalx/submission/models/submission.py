@@ -67,9 +67,13 @@ class SubmissionStates(Choices):
         ACCEPTED: (CONFIRMED, CANCELED, REJECTED, SUBMITTED, WITHDRAWN),
         CONFIRMED: (ACCEPTED, CANCELED),
         CANCELED: (ACCEPTED, CONFIRMED),
-        WITHDRAWN: (SUBMITTED),
+        WITHDRAWN: (SUBMITTED, ),
         DELETED: tuple(),
     }
+    valid_previous_states = {key[0]: [] for key in valid_choices}
+    for state, next_states in valid_next_states.items():
+        for next_state in next_states:
+            valid_previous_states[next_state].append(state)
 
     method_names = {
         SUBMITTED: 'make_submitted',
@@ -264,12 +268,6 @@ class Submission(LogMixin, models.Model):
         if not self.code:
             self.assign_code()
         super().save(*args, **kwargs)
-
-    @property
-    def editable(self):
-        if self.state == SubmissionStates.SUBMITTED:
-            return self.event.cfp.is_open or (self.event.active_review_phase and self.event.active_review_phase.speakers_can_change_submissions)
-        return self.state in (SubmissionStates.ACCEPTED, SubmissionStates.CONFIRMED)
 
     def get_duration(self) -> int:
         """Returns this submission's duration in minutes.

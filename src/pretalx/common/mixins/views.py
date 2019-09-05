@@ -5,6 +5,7 @@ from urllib.parse import quote
 
 from django import forms
 from django.conf import settings
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import FieldDoesNotExist
 from django.db.models import CharField, Q
 from django.db.models.functions import Lower
@@ -16,7 +17,6 @@ from django.utils.translation import gettext_lazy as _
 from django_context_decorator import context
 from formtools.wizard.forms import ManagementForm
 from i18nfield.forms import I18nModelForm
-from rules.contrib.views import PermissionRequiredMixin
 
 from pretalx.common.forms import SearchForm
 
@@ -168,10 +168,13 @@ class Filterable:
 
 class PermissionRequired(PermissionRequiredMixin):
 
+    def get_permission_object(self):
+        return getattr(self, 'object', None)
+
     def has_permission(self):
-        if not hasattr(self, 'get_permission_object') and hasattr(self, 'object'):
-            self.get_permission_object = lambda self: self.object
-        result = super().has_permission()
+        obj = self.get_permission_object()
+        perms = self.get_permission_required()
+        result = self.request.user.has_perms(perms, obj)
         if not result:
             request = getattr(self, 'request', None)
             if request and hasattr(request, 'event'):

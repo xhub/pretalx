@@ -301,7 +301,7 @@ class SubmissionsEditView(LoggedInEventPageMixin, SubmissionViewMixin, UpdateVie
     @context
     @cached_property
     def can_edit(self):
-        return self.object.editable
+        return self.request.user.has_perm('submission.edit_submission', self.object)
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

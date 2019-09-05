@@ -62,7 +62,8 @@
                             </button>
                         {% endif %}
                         <a href="{{ submission.urls.user_base }}" class="btn btn-sm btn-info">
-                            <i class="fa fa-{{ submission.editable|yesno:'edit,eye' }}"></i>
+                            {% has_perm 'submission.edit_submission' request.user permission as can_edit_submission %}
+                            <i class="fa fa-{{ can_edit_submission|yesno:'edit,eye' }}"></i>
                         </a>
                         {% if submission.state == 'accepted' %}
                             <a href="{{ submission.urls.confirm }}"

@@ -1,19 +1,15 @@
-import rules
+from bridgekeeper import perms
+from bridgekeeper.rules import R
 from django.utils.timezone import now
 
 from pretalx.person.permissions import can_change_submissions, is_reviewer
 
-
-@rules.predicate
-def is_event_visible(user, event):
-    return event and event.is_public
+is_event_visible = R(is_public=True)
 
 
-@rules.predicate
-def submission_deadline_open(user, submission):
-    deadline = submission.submission_type.deadline or submission.event.cfp.deadline
-    return (not deadline) or now() <= deadline
-
-
-rules.add_perm('cfp.view_event', is_event_visible | (can_change_submissions | is_reviewer))
-rules.add_perm('cfp.add_speakers', submission_deadline_open)
+perms['cfp.view_event'] = is_event_visible | (can_change_submissions | is_reviewer)
+perms['cfp.add_speakers'] = (
+    R(submission_type__deadline__isnull=True, event__cfp__deadline__isnull=True)  # no deadline at all
+    | R(submission_type__deadline__isnull=False, submission_type__deadline__gte=now)  # TODO: now()
+    | R(submission_type__deadline__isnull=True, event__cfp__deadline__isnull=False, event__cfp__deadline__gte=now)  # TODO: now()
+)

@@ -20,7 +20,7 @@ def test_agenda_permission_is_agenda_visible(is_public, show_schedule, has_sched
         event.settings.show_schedule = show_schedule
         if has_schedule:
             event.release_schedule('42')
-        assert is_agenda_visible(None, event) is result
+        assert is_agenda_visible.check(None, event) is result
 
 
 @pytest.mark.django_db
@@ -33,7 +33,7 @@ def test_agenda_permission_is_agenda_visible(is_public, show_schedule, has_sched
 def test_agenda_permission_is_feedback_ready(slot_visible, accept_feedback, result, slot, monkeypatch):
     monkeypatch.setattr('pretalx.agenda.permissions.is_submission_visible', lambda x, y: slot_visible)
     monkeypatch.setattr('pretalx.submission.models.submission.Submission.does_accept_feedback', accept_feedback)
-    assert is_feedback_ready(None, slot.submission) is result
+    assert is_feedback_ready.check(None, slot.submission) is result
 
 
 @pytest.mark.django_db
@@ -44,4 +44,4 @@ def test_agenda_permission_is_feedback_ready(slot_visible, accept_feedback, resu
 def test_agenda_permission_is_speaker_viewable(agenda_visible, result, speaker, slot, schedule, monkeypatch):
     monkeypatch.setattr('pretalx.agenda.permissions.is_agenda_visible', lambda x, y: agenda_visible)
     with scope(event=schedule.event):
-        assert is_speaker_viewable(None, speaker.profiles.first()) is result
+        assert is_speaker_viewable.check(None, speaker.profiles.first()) is result
