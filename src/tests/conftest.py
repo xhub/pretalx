@@ -15,6 +15,7 @@ from pretalx.submission.models import (
     Answer, AnswerOption, Feedback, Question, QuestionVariant,
     Resource, Review, Submission, SubmissionType, Track,
 )
+from tests.hypothesis import *  # noqa
 
 
 @pytest.fixture(scope="session", autouse=True)

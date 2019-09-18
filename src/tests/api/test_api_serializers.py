@@ -1,5 +1,8 @@
 import pytest
-from django_scopes import scope
+from django_scopes import scope, scopes_disabled
+from hypothesis import given, settings, Verbosity
+from hypothesis.extra.django import TestCase, from_model
+from hypothesis.strategies import just
 
 from pretalx.api.serializers.event import EventSerializer
 from pretalx.api.serializers.question import AnswerSerializer, QuestionSerializer
@@ -11,37 +14,80 @@ from pretalx.api.serializers.speaker import (
 from pretalx.api.serializers.submission import (
     SubmissionOrgaSerializer, SubmissionSerializer,
 )
+from pretalx.event.models import Event
+from pretalx.submission.models import Answer, Question, Submission
 
 
-@pytest.mark.django_db
-def test_event_serializer(event):
-    data = EventSerializer(event).data
-    assert data.keys() == {
-        'name',
-        'slug',
-        'is_public',
-        'date_from',
-        'date_to',
-        'timezone',
-        'urls',
+event_defaults = {
+    value: just(None)
+    for value in ['accept_template', 'ack_template', 'reject_template', 'update_template', 'question_template', 'plugins']
+}
+
+
+def prefix(data, prefix='event'):
+    return {
+        f'{prefix}__{key}': value
+        for key, value in data.items()
     }
 
 
-@pytest.mark.django_db
-def test_question_serializer(answer):
-    with scope(event=answer.question.event):
-        data = AnswerSerializer(answer).data
-        assert set(data.keys()) == {
-            'id',
-            'question',
-            'answer',
-            'answer_file',
-            'submission',
-            'person',
-            'options',
+class TestSerializers(TestCase):
+
+    @scopes_disabled()
+    @given(event=from_model(Event, **event_defaults, __save=False))
+    def test_event_serializer(self, event):
+        data = EventSerializer(event).data
+        assert data == {
+            'name': event.name,
+            'slug': event.slug,
+            'is_public': event.is_public,
+            'date_from': event.date_from.isoformat(),
+            'date_to': event.date_to.isoformat(),
+            'timezone': event.timezone,
+            'urls': {
+                key: getattr(event.urls, key).full()
+                for key in ['base', 'schedule', 'login', 'feed']
+            },
         }
-        data = QuestionSerializer(answer.question).data
-    assert set(data.keys()) == {'id', 'question', 'required', 'target', 'options'}
+
+    @scopes_disabled()
+    @given(answer=from_model(
+        Answer,
+        __save=False,
+        __infer_related_fields=True,
+        submission=from_model(Submission, **prefix(event_defaults)),
+        **prefix(event_defaults, 'question__event')
+    ))
+    def test_answer_serializer(self, answer):
+        with scope(event=answer.question.event):
+            data = AnswerSerializer(answer).data
+            assert data == {
+                'id': answer.id,
+                'question': QuestionSerializer(answer.question).data,
+                'answer': answer.answer,
+                'answer_file': answer.answer_file.url if answer.answer_file else None,
+                'submission': answer.submission.code if answer.submission else None,
+                'person': None,  # TODO: get answer.person to work
+                'options': [option.answer for option in answer.options.all()],
+            }
+
+    @scopes_disabled()
+    @given(question=from_model(
+        Question,
+        __save=False,
+        __infer_related_fields=True,
+        **prefix(event_defaults),
+    ))
+    def test_question_serializer(self, question):
+        with scope(event=question.event):
+            data = QuestionSerializer(question).data
+            assert data == {
+                'id': question.id,
+                'question': question.question,
+                'required': question.required,
+                'target': question.target,
+                'options': [option.answer for option in question.options.all()]
+            }
 
 
 @pytest.mark.django_db
