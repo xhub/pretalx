@@ -5,7 +5,7 @@
 {% load i18n %}
 {% load static %}
 
-{% block title %}{% trans "Your Profile" %} :: {% endblock %}
+{% block title %}{% trans "Your profile" %} :: {% endblock %}
 
 {% block content %}
     {% if profile_form.biography %}
@@ -15,7 +15,7 @@
 
     {% html_signal "pretalx.cfp.signals.html_above_profile_page" sender=request.event request=request %}
 
-    <h2>{% trans "Your Profile" %}</h2>
+    <h2>{% trans "Your profile" %}</h2>
     <p>
         {% trans "This data will be displayed publicly if your talk is accepted. It is also visible to reviewers." %}
     </p>
@@ -69,7 +69,7 @@
     </form>
 
     {% if questions_exist %}
-    <h2>{% trans "We have some questions" %}</h2>
+    <h2>{% trans "Your personal info" %}</h2>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {% bootstrap_form questions_form layout='event' %}
@@ -83,7 +83,7 @@
     </form>
     {% endif %}
 
-    <h2>{% trans "Your Account" %}</h2>
+    <h2>{% trans "Your account" %}</h2>
     <p>
         {% trans "You can change your log in data here." %}
     </p>
