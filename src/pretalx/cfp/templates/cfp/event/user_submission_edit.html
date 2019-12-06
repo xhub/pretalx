@@ -50,17 +50,8 @@
                     {% plural %}
                     Speakers:
                 {% endblocktrans %}
-                {{ submission.display_speaker_names }}{% if can_invite_speakers %},
-                <div class="input-group">
-                    <input name="email" class="form-control form-control-sm" placeholder="mail@example.org">
-                    <span class="input-group-btn">
-                        <button class="btn btn-success btn-sm">
-                            <i class="fa fa-plus"></i>
-                        </button>
-                    </span>
-                </div>
-                {% endif %}
-            </div>
+                {{ submission.display_speaker_names }}
+	    </div>
         </form>
     </h5>
     <form method="post" enctype="multipart/form-data">

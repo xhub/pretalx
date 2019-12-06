@@ -328,7 +328,9 @@ class InfoStep(GenericFlowStep, FormFlowStep):
         submission.log_action("pretalx.submission.create", person=request.user)
         messages.success(request, phrases.cfp.submission_success)
 
-        additional_speaker = form.cleaned_data.get("additional_speaker").strip()
+        additional_speaker = form.cleaned_data.get('additional_speaker')
+        if additional_speaker:
+            additional_speaker = additional_speaker.strip()
         if additional_speaker:
             try:
                 submission.send_invite(to=[additional_speaker], _from=request.user)

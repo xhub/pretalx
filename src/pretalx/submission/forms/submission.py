@@ -15,13 +15,12 @@ from pretalx.submission.models import Submission, SubmissionStates
 
 
 class InfoForm(CfPFormMixin, RequestRequire, PublicContent, forms.ModelForm):
-    additional_speaker = forms.EmailField(
-        label=_("Additional Speaker"),
-        help_text=_(
-            "If you have a co-speaker, please add their email address here, and we will invite them to create an account. If you have more than one co-speaker, you can add more speakers after finishing the submission process."
-        ),
-        required=False,
-    )
+    additional_speaker = ''
+#    forms.EmailField(
+#        label=_('Additional Speaker'),
+#        help_text=_('If you have a co-speaker, please add their email address here, and we will invite them to create an account. If you have more than one co-speaker, you can add more speakers after finishing the submission process.'),
+#        required=False,
+#    )
 
     def __init__(self, event, **kwargs):
         self.event = event
@@ -42,11 +41,11 @@ class InfoForm(CfPFormMixin, RequestRequire, PublicContent, forms.ModelForm):
 
         super().__init__(initial=initial, **kwargs)
 
-        self.fields["title"].label = _("Submission title")
-        if "abstract" in self.fields:
-            self.fields["abstract"].widget.attrs["rows"] = 2
-        if instance and instance.pk:
-            self.fields.pop("additional_speaker")
+        self.fields['title'].label = _('Submission title')
+        if 'abstract' in self.fields:
+            self.fields['abstract'].widget.attrs['rows'] = 2
+#        if instance and instance.pk:
+#            self.fields.pop('additional_speaker')
 
         self._set_track(instance=instance)
         self._set_submission_types(instance=instance)
