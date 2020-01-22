@@ -10,6 +10,11 @@
         {{ request.event.landing_page_text|rich_text }}
     {% endif %}
     <div class="row mb-4 url-links">
+        {% if cfp.is_open and not is_html_export %}
+            <a class="btn btn-info btn-lg btn-block" href="{{ request.event.cfp.urls.public }}{{ submit_qs }}">
+                {% trans "Proceed to submission" %}
+            </a>
+        {% endif %}
         {% if has_submissions or request.user.is_anonymous %}
             {% if not is_html_export %}
                 <a class="btn btn-info btn-lg btn-block" href="{{ request.event.urls.user_submissions }}">
@@ -17,18 +22,13 @@
                 </a>
             {% endif %}
         {% endif %}
-        {% if can_view_schedule %}
+        {% if False and can_view_schedule %}
             <a class="btn btn-success btn-lg btn-block" href="{{ request.event.urls.schedule }}">
                 {% trans "View conference schedule" %}
             </a>
-        {% elif can_view_sneak_peek and has_sneak_peek %}
+        {% elif False and can_view_sneak_peek and has_sneak_peek %}
             <a class="btn btn-info btn-lg btn-block" href="{{ request.event.urls.sneakpeek }}">
                 {% trans "View schedule preview" %}
-            </a>
-        {% endif %}
-        {% if cfp.is_open and not is_html_export %}
-            <a class="btn btn-info btn-lg btn-block" href="{{ request.event.cfp.urls.public }}{{ submit_qs }}">
-                {% trans "Go to CfP" %}
             </a>
         {% endif %}
     </div>
