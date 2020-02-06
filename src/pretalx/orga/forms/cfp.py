@@ -218,58 +218,24 @@ class AccessCodeSendForm(forms.Form):
 
     def __init__(self, *args, instance, user, **kwargs):
         self.access_code = instance
-        subject = _("Access code for the {event} CfP").format(event=instance.event.name)
+        subject = _("[FBP2020] Important information regarding your mini-symposium \"{track}\"").format(track=instance.track.name)
         text = (
             str(
                 _(
-                    """Hi!
+                    """Dear colleagues,
 
-This is an access code for the {event} CfP."""
-                ).format(event=instance.event.name)
-            )
-            + " "
-        )
-        if instance.track:
-            text += (
-                str(
-                    _(
-                        "It will allow you to submit a proposal to the “{track}” track."
-                    ).format(track=instance.track.name)
-                )
-                + " "
-            )
-        else:
-            text += str(_("It will allow you to submit a proposal to our CfP.")) + " "
-        if instance.valid_until:
-            text += (
-                str(
-                    _("This access code is valid until {date}.").format(
-                        date=instance.valid_until.strftime("%Y-%m-%d %H:%M")
-                    )
-                )
-                + " "
-            )
-        if (
-            instance.maximum_uses
-            and instance.maximum_uses != 1
-            and instance.maximum_uses - instance.redeemed > 1
-        ):
-            text += str(
-                _("The code can be redeemed multiple times ({num}).").format(
-                    num=instance.redemptions_left
-                )
-            )
-        text += _(
-            """
-Please follow this URL to use the code:
+Thank you for organising the “{track}” mini-symposium for FBP2020.
+
+We kindly ask you to direct speakers of your mini-symposium to not use the URL for general contribution (e.g. https://fbp2020.de/contributions/cfp), but to submit their title and abstract using only this URL:
 
   {url}
 
-I'm looking forward to your submission!
-{name}"""
-        ).format(url=instance.urls.cfp_url.full(), name=user.get_display_name(),)
+We are looking forward to welcoming you in Berlin.
+
+The organisers of FBP 2020.""").format(
+        url=instance.urls.cfp_url.full(), track=instance.track.name),))
         initial = kwargs.get("intial", {})
-        initial["subject"] = f"[{instance.event.slug}] {subject}"
+        initial["subject"] = f"{subject}"
         initial["text"] = text
         kwargs["initial"] = initial
         super().__init__(*args, **kwargs)
