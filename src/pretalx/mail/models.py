@@ -2,6 +2,8 @@ from copy import deepcopy
 
 import bleach
 import markdown
+import re
+
 from django.db import models, transaction
 from django.template.loader import get_template
 from django.utils.timezone import now
@@ -251,7 +253,7 @@ class QueuedMail(LogMixin, models.Model):
 
         has_event = getattr(self, "event", None)
         text = self.make_text(self.text, event=has_event)
-        body_html = self.make_html(text)
+        body_html = self.make_html(re.sub('\n-- \n', '\n</br></br>-- </br>\n', text))
 
         from pretalx.common.mail import mail_send_task
 
