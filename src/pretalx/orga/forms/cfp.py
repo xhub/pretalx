@@ -218,11 +218,11 @@ class AccessCodeSendForm(forms.Form):
 
     def __init__(self, *args, instance, user, **kwargs):
         self.access_code = instance
-        subject = _("[FBP2020] Important information regarding your mini-symposium \"{track}\"").format(track=instance.track.name)
+        subject = _("Important information regarding your mini-symposium \"{track}\"").format(track=instance.track.name)
         text = (
             str(
                 _(
-                    """Dear colleagues,
+                    """Dear colleague,
 
 Thank you for organising the “{track}” mini-symposium for FBP2020.
 
@@ -232,7 +232,7 @@ We kindly ask you to direct speakers of your mini-symposium to not use the URL f
 
 We are looking forward to welcoming you in Berlin.
 
-The organisers of FBP 2020.""").format(
+""").format(
         url=instance.urls.cfp_url.full(), track=instance.track.name),))
         initial = kwargs.get("intial", {})
         initial["subject"] = f"{subject}"
