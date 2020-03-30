@@ -4,6 +4,7 @@
 
 {% block content %}
 {% has_perm 'orga.view_speakers' request.user request.event as can_view_speakers %}
+{% has_perm 'person.is_administrator' request.user request.organiser as can_view_event_details %}
 {% if "congratulations" in request.GET %}
 <div class="alert alert-success congratulations">
     {% blocktrans trimmed %}
@@ -14,6 +15,7 @@
     </span>
 </div>
 {% endif %}
+{% if can_view_event_details %}
 <h2 id="main-title">
     <span>
         {{ request.event.name }}
@@ -80,5 +82,6 @@
 <div class="dashboard-history">
     {% include "common/logs.html" with entries=history %}
 </div>
+{% endif %}
 {% endif %}
 {% endblock %}
