@@ -8,6 +8,7 @@ from dateutil import rrule
 from django.contrib import messages
 from django.contrib.syndication.views import Feed
 from django.db import transaction
+from django.db.models import Q
 from django.forms.models import BaseModelFormSet, inlineformset_factory
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
@@ -446,6 +447,17 @@ class SubmissionList(EventPermissionRequired, Sortable, Filterable, ListView):
         qs = self.filter_queryset(qs)
         if "state" not in self.request.GET:
             qs = qs.exclude(state="deleted")
+        limit_tracks = self.request.user.teams.filter(
+            Q(all_events=True)
+            | Q(Q(all_events=False) & Q(limit_events__in=[self.request.event])),
+            limit_tracks__isnull=False,
+        ).prefetch_related("limit_tracks")
+        if limit_tracks:
+            tracks = set()
+            for team in limit_tracks:
+                tracks.update(team.limit_tracks.filter(event=self.request.event))
+            qs = qs.filter(track__in=tracks)
+
         qs = self.sort_queryset(qs)
         return qs.distinct()
 
