@@ -328,16 +328,6 @@ class InfoStep(GenericFlowStep, FormFlowStep):
         submission.log_action("pretalx.submission.create", person=request.user)
         messages.success(request, phrases.cfp.submission_success)
 
-        additional_speaker = form.cleaned_data.get('additional_speaker')
-        if additional_speaker:
-            additional_speaker = additional_speaker.strip()
-        if additional_speaker:
-            try:
-                submission.send_invite(to=[additional_speaker], _from=request.user)
-            except SendMailException as exception:
-                logging.getLogger("").warning(str(exception))
-                messages.warning(self.request, phrases.cfp.submission_email_fail)
-
         access_code = getattr(request, "access_code", None)
         if access_code:
             submission.access_code = access_code
