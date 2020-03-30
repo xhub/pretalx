@@ -170,19 +170,25 @@ class TeamInvite(models.Model):
             "orga:invitation.view", kwargs={"code": self.token}
         )
         invitation_text = _(
-            """Hi!
-You have been invited to the {name} event organiser team - Please click here to accept:
+            """Dear mini-symposium organizer,
+
+Please use the following link to gain access to the contributions of your mini-symposium
 
 {invitation_link}
 
-See you there,
-The {event} team"""
+This will enable you to see and edit the contributions.
+
+Please remind the speakers who have not yet submitted to do so as soon as possible.
+
+We look forward to welcome you in Berlin!
+
+The local organisers of FBP2020"""
         ).format(
             name=str(self.team.name),
             invitation_link=invitation_link,
             event=str(event.name) if event else str(self.team.organiser.name),
         )
-        invitation_subject = _("You have been invited to an organiser team")
+        invitation_subject = _("[FBP2020] Organiser link for mini-symposium")
 
         mail = QueuedMail.objects.create(
             to=self.email,
